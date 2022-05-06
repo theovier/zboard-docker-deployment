@@ -8,4 +8,4 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
 RUN a2enmod rewrite
 
-COPY ./ /var/www/html/
+COPY ../z-board-server /var/www/html/
