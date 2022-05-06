@@ -21,7 +21,7 @@ services:
     container_name: zboard-api
     restart: unless-stopped
     volumes:
-      - root/zboard-server/:/var/www/html/
+      - /root/zboard-server/:/var/www/html/
     ports:
       - 80:80
 
