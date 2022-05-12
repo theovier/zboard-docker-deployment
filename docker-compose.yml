@@ -33,7 +33,6 @@ services:
 #      - "traefik.enable=true"
 #      - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
 #      - "traefik.http.routers.api.entrypoints=web"
-#      - "traefik.docker.network=proxy"
 #
 #  mariadb:
 #    image: 'mariadb:10'
@@ -53,14 +52,14 @@ services:
 #      retries: 3
 #      timeout: 5s
 #
-#  phpmyadmin:
-#    image: phpmyadmin
-#    container_name: phpmyadmin
-#    ports:
-#      - "9081:80"
-#    networks:
-#      - proxy
-#    restart: unless-stopped
-#    environment:
-#      - PMA_ARBITRARY=1
-#      - UPLOAD_LIMIT=300M
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: "phpmyadmin"
+    restart: unless-stopped
+    environment:
+      - PMA_ARBITRARY=1
+      - UPLOAD_LIMIT=300M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`db.theovier.de`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
