@@ -5,9 +5,6 @@ networks:
     external: true
   database:
     driver: bridge
-    ipam:
-      driver: default
-    external: false
 
 services:
   traefik:
@@ -79,5 +76,4 @@ services:
       - "traefik.http.routers.phpmyadmin.entrypoints=web"
     hostname: phpmyadmin
     networks:
-      - proxy
       - database
