@@ -68,7 +68,8 @@ services:
     depends_on:
       - mariadb
     environment:
-      - PMA_ARBITRARY=1
+      - PMA_HOST=mariadb
+      - PMA_PORT=3306
       - UPLOAD_LIMIT=300M
     labels:
       - "traefik.enable=true"
