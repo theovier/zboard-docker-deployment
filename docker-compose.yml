@@ -2,7 +2,7 @@ version: '3.8'
 
 networks:
   internal:
-    external: false
+    driver: bridge
   proxy:
     external: true
 
@@ -43,20 +43,18 @@ services:
   mariadb:
     image: 'mariadb:10'
     container_name: 'mariadb'
+    hostname: mariadb
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
-      MYSQL_ROOT_HOST: "%"
       MYSQL_DATABASE: '${DB_DATABASE}'
       MYSQL_USER: '${DB_USERNAME}'
       MYSQL_PASSWORD: '${DB_PASSWORD}'
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-    ports:
-      - '3306:3306'
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
       retries: 3
       timeout: 5s
+
     networks:
       - internal
 
@@ -68,7 +66,6 @@ services:
       - mariadb
     environment:
       - PMA_ARBITRARY=1
-      - UPLOAD_LIMIT=300M
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
