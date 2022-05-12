@@ -10,7 +10,6 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     command:
-      - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -21,18 +20,17 @@ services:
       - "traefik.http.routers.traefik.entrypoints=web"
       - "traefik.http.services.traefik.loadBalancer.server.port=8080"
 
-#  api:
-#    build:
-#      context: apache
-#    container_name: api
-#    hostname: "api"
-#    volumes:
-#      - /root/zboard-server/:/var/www/html/
-#    restart: unless-stopped
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
-#      - "traefik.http.routers.api.entrypoints=web"
+  api:
+    build:
+      context: apache
+    container_name: "api"
+    volumes:
+      - "/root/zboard-server/:/var/www/html/"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
+      - "traefik.http.routers.api.entrypoints=web"
 #
 #  mariadb:
 #    image: 'mariadb:10'
