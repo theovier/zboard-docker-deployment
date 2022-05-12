@@ -1,8 +1,6 @@
 version: '3.8'
 
 networks:
-  proxy:
-    external: true
   database:
     driver: bridge
 
@@ -26,7 +24,7 @@ services:
       - "traefik.http.routers.traefik.entrypoints=web"
       - "traefik.http.services.traefik.loadBalancer.server.port=8080"
     networks:
-      - proxy
+      - database
 
   api:
     build:
@@ -52,12 +50,11 @@ services:
       MYSQL_PASSWORD: '${DB_PASSWORD}'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
-      - '${FORWARD_DB_PORT:-3306}:3306'
+      - '3306:3306'
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
       retries: 3
       timeout: 5s
-    hostname: mariadb
     networks:
       - database
 
@@ -75,6 +72,5 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
       - "traefik.http.routers.phpmyadmin.entrypoints=web"
-    hostname: phpmyadmin
     networks:
       - database
