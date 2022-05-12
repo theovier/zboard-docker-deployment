@@ -2,18 +2,32 @@ version: '3.8'
 
 services:
 
-  reverse-proxy:
+  traefik:
     image: traefik:latest
-    # Enables the web UI and tells Traefik to listen to docker
-    command: --api.insecure=true --providers.docker
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
     ports:
-      # The HTTP port
       - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
     volumes:
-      # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+
+  api:
+    build:
+      context: apache
+    container_name: zboard-api
+    restart: unless-stopped
+    volumes:
+      - /root/zboard-server/:/var/www/html/
+    ports:
+      - "9080:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cal.rule=Host(`api.theovier.de`)"
+      - "traefik.http.routers.cal.entrypoints=web"
 
   mariadb:
     image: 'mariadb:10'
@@ -29,26 +43,16 @@ services:
     ports:
       - '${FORWARD_DB_PORT:-3306}:3306'
     healthcheck:
-          test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
-          retries: 3
-          timeout: 5s
-
-  api:
-    build:
-      context: apache
-    container_name: zboard-api
-    restart: unless-stopped
-    volumes:
-      - /root/zboard-server/:/var/www/html/
-    ports:
-      - 80:80
+      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+      retries: 3
+      timeout: 5s
 
   phpmyadmin:
     image: phpmyadmin
     container_name: phpmyadmin
     restart: unless-stopped
     ports:
-      - 81:80
+      - "81:80"
     environment:
       - PMA_ARBITRARY=1
       - UPLOAD_LIMIT=300M
