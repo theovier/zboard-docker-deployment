@@ -20,13 +20,16 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.theovier.de`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.services.traefik.api.loadbalancer.server.port=8080"
 
   api:
     build:
       context: apache
     container_name: api
-    ports:
-      - "9080:80"
     volumes:
       - /root/zboard-server/:/var/www/html/
     networks:
@@ -36,6 +39,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
       - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.services.traefik.api.loadbalancer.server.port=8080"
 
   mariadb:
     image: 'mariadb:10'
