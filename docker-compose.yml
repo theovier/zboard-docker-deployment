@@ -19,6 +19,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`admin.theovier.de`)"
       - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.services.traefik.loadBalancer.server.port=8080"
 
 #  api:
 #    build:
