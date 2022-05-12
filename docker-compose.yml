@@ -1,8 +1,10 @@
 version: '3.8'
 
 networks:
-  database:
-    driver: bridge
+  internal:
+    external: false
+  proxy:
+    external: true
 
 services:
   traefik:
@@ -24,7 +26,7 @@ services:
       - "traefik.http.routers.traefik.entrypoints=web"
       - "traefik.http.services.traefik.loadBalancer.server.port=8080"
     networks:
-      - database
+      - proxy
 
   api:
     build:
@@ -56,7 +58,7 @@ services:
       retries: 3
       timeout: 5s
     networks:
-      - database
+      - internal
 
   phpmyadmin:
     image: phpmyadmin
@@ -65,12 +67,12 @@ services:
     depends_on:
       - mariadb
     environment:
-      - PMA_HOST=mariadb
-      - PMA_PORT=3306
+      - PMA_ARBITRARY=1
       - UPLOAD_LIMIT=300M
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
       - "traefik.http.routers.phpmyadmin.entrypoints=web"
     networks:
-      - database
+      - internal
+      - proxy
