@@ -54,7 +54,6 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
       retries: 3
       timeout: 5s
-
     networks:
       - internal
 
@@ -62,8 +61,6 @@ services:
     image: phpmyadmin
     container_name: "phpmyadmin"
     restart: unless-stopped
-    depends_on:
-      - mariadb
     environment:
       - PMA_ARBITRARY=1
     labels:
