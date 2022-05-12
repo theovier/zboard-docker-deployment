@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  backend:
+    driver: bridge
+
 services:
   traefik:
     image: "traefik:v2.6"
@@ -45,6 +49,8 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
       - '${FORWARD_DB_PORT:-3306}:3306'
+    networks:
+      - backend
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
       retries: 3
@@ -61,3 +67,5 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`db.theovier.de`)"
       - "traefik.http.routers.whoami.entrypoints=web"
+    networks:
+      - backend
