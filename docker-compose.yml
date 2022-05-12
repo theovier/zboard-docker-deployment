@@ -4,6 +4,9 @@ networks:
   proxy:
     external: true
   database:
+    driver: bridge
+    ipam:
+      driver: default
     external: false
 
 services:
@@ -57,6 +60,7 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
       retries: 3
       timeout: 5s
+    hostname: mariadb
     networks:
       - database
 
@@ -71,8 +75,9 @@ services:
       - UPLOAD_LIMIT=300M
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`db.theovier.de`)"
-      - "traefik.http.routers.whoami.entrypoints=web"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
+      - "traefik.http.routers.phpmyadmin.entrypoints=web"
+    hostname: phpmyadmin
     networks:
       - proxy
       - database
