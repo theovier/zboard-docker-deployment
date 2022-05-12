@@ -40,9 +40,8 @@ services:
       - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
       - "traefik.http.routers.api.entrypoints=web"
 
-  mariadb:
+  db:
     image: 'mariadb:10'
-    container_name: 'mariadb'
     hostname: mariadb
     restart: unless-stopped
     ports:
@@ -59,17 +58,28 @@ services:
     networks:
       - internal
 
-  phpmyadmin:
-    image: phpmyadmin
-    container_name: "phpmyadmin"
+#  phpmyadmin:
+#    image: phpmyadmin
+#    container_name: "phpmyadmin"
+#    restart: unless-stopped
+#    environment:
+#      PMA_ARBITRARY: 1
+#      PMA_HOST: db
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
+#      - "traefik.http.routers.phpmyadmin.entrypoints=web"
+#    networks:
+#      - internal
+#      - proxy
+
+  adminer:
+    image: adminer
     restart: unless-stopped
-    environment:
-      PMA_ARBITRARY: 1
-      PMA_HOST: mariadb
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
       - "traefik.http.routers.phpmyadmin.entrypoints=web"
     networks:
-      - internal
       - proxy
+      - internal
