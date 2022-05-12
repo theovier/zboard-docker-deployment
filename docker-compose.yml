@@ -22,9 +22,11 @@ services:
       - "--entrypoints.web.address=:80"
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
       - "traefik.http.routers.traefik.rule=Host(`traefik.theovier.de`)"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.services.traefik.api.loadbalancer.server.port=8080"
+      - "traefik.http.routers.traefik.entrypoints=http"
 
   api:
     build:
@@ -39,6 +41,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
       - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.docker.network=proxy"
       - "traefik.http.services.traefik.api.loadbalancer.server.port=8080"
 
   mariadb:
