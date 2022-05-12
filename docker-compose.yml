@@ -1,8 +1,10 @@
 version: '3.8'
 
 networks:
-  backend:
-    driver: bridge
+  proxy:
+    external: true
+  database:
+    external: false
 
 services:
   traefik:
@@ -23,6 +25,8 @@ services:
       - "traefik.http.routers.traefik.rule=Host(`admin.theovier.de`)"
       - "traefik.http.routers.traefik.entrypoints=web"
       - "traefik.http.services.traefik.loadBalancer.server.port=8080"
+    networks:
+      - proxy
 
   api:
     build:
@@ -38,7 +42,7 @@ services:
 
   mariadb:
     image: 'mariadb:10'
-    container_name: mariadb
+    container_name: 'mariadb'
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
@@ -49,17 +53,19 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
       - '${FORWARD_DB_PORT:-3306}:3306'
-    networks:
-      - backend
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
       retries: 3
       timeout: 5s
+    networks:
+      - database
 
   phpmyadmin:
     image: phpmyadmin
     container_name: "phpmyadmin"
     restart: unless-stopped
+    depends_on:
+      - mariadb
     environment:
       - PMA_ARBITRARY=1
       - UPLOAD_LIMIT=300M
@@ -68,4 +74,5 @@ services:
       - "traefik.http.routers.whoami.rule=Host(`db.theovier.de`)"
       - "traefik.http.routers.whoami.entrypoints=web"
     networks:
-      - backend
+      - proxy
+      - database
