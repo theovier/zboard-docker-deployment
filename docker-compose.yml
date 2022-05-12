@@ -73,3 +73,15 @@ services:
     networks:
       - proxy
       - internal
+
+  frontend:
+    image: nginx
+    container_name: 'frotend'
+    volumes:
+      - "/root/zboard-client/dist:/usr/share/nginx/html:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`theovier.de`)"
+      - "traefik.http.routers.phpmyadmin.entrypoints=web"
+    networks:
+      - proxy
