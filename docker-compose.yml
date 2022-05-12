@@ -1,40 +1,89 @@
 version: '3.8'
 
+networks:
+  internal:
+    driver: bridge
+  proxy:
+    external: true
+
 services:
-  mariadb:
-    image: 'mariadb:10'
-    container_name: mariadb
+  traefik:
+    image: "traefik:v2.6"
+    container_name: 'traefik'
     restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
-      MYSQL_ROOT_HOST: "%"
-      MYSQL_DATABASE: '${DB_DATABASE}'
-      MYSQL_USER: '${DB_USERNAME}'
-      MYSQL_PASSWORD: '${DB_PASSWORD}'
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
-      - '${FORWARD_DB_PORT:-3306}:3306'
-    healthcheck:
-          test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
-          retries: 3
-          timeout: 5s
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`admin.theovier.de`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.services.traefik.loadBalancer.server.port=8080"
+    networks:
+      - proxy
 
   api:
     build:
       context: apache
-    container_name: zboard-api
+    container_name: 'api'
+    volumes:
+      - "/root/zboard-server/:/var/www/html/"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
+      - "traefik.http.routers.api.entrypoints=web"
+    networks:
+      - proxy
+      - internal
+
+  db:
+    image: 'mariadb:10'
+    container_name: 'db'
+    restart: unless-stopped
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+      retries: 3
+      timeout: 5s
+    networks:
+      - internal
+
+  adminer:
+    image: adminer
+    container_name: 'adminer'
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
+      - "traefik.http.routers.phpmyadmin.entrypoints=web"
+    networks:
+      - proxy
+      - internal
+
+  frontend:
+    image: nginx
+    container_name: 'frontend'
     restart: unless-stopped
     volumes:
-      - /root/zboard-server/:/var/www/html/
-    ports:
-      - 80:80
-
-  phpmyadmin:
-    image: phpmyadmin
-    container_name: phpmyadmin
-    restart: unless-stopped
-    ports:
-      - 81:80
-    environment:
-      - PMA_ARBITRARY=1
-      - UPLOAD_LIMIT=300M
+      - "/root/zboard-client/dist:/usr/share/nginx/html:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`zboard.theovier.de`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+    command: ['nginx-debug', '-g', 'daemon off;']
+    networks:
+      - proxy
