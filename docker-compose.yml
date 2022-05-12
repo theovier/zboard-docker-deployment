@@ -31,25 +31,25 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
       - "traefik.http.routers.api.entrypoints=web"
-#
-#  mariadb:
-#    image: 'mariadb:10'
-#    container_name: mariadb
-#    restart: unless-stopped
-#    environment:
-#      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
-#      MYSQL_ROOT_HOST: "%"
-#      MYSQL_DATABASE: '${DB_DATABASE}'
-#      MYSQL_USER: '${DB_USERNAME}'
-#      MYSQL_PASSWORD: '${DB_PASSWORD}'
-#      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-#    ports:
-#      - '${FORWARD_DB_PORT:-3306}:3306'
-#    healthcheck:
-#      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
-#      retries: 3
-#      timeout: 5s
-#
+
+  mariadb:
+    image: 'mariadb:10'
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - '${FORWARD_DB_PORT:-3306}:3306'
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+      retries: 3
+      timeout: 5s
+
   phpmyadmin:
     image: phpmyadmin
     container_name: "phpmyadmin"
