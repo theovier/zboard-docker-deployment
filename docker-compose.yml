@@ -14,6 +14,12 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:admin.theovier.de"
+      - "traefik.frontend.entryPoints=https-admin"
+      - "traefik.http.routers.api.rule=Host(`admin.theovier.de`)"
+      - "traefik.http.routers.api.service=api@internal"
 
   api:
     build:
@@ -26,8 +32,8 @@ services:
       - "9080:80"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cal.rule=Host(`api.theovier.de`)"
-      - "traefik.http.routers.cal.entrypoints=web"
+      - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
+      - "traefik.http.routers.api.entrypoints=web"
 
   mariadb:
     image: 'mariadb:10'
