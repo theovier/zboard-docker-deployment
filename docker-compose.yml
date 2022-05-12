@@ -6,7 +6,7 @@ networks:
 
 services:
   traefik:
-    image: traefik:latest
+    image: traefik:2.6
     container_name: traefik
     ports:
       - "80:80"
@@ -32,6 +32,7 @@ services:
     build:
       context: apache
     container_name: api
+    hostname: "api"
     volumes:
       - /root/zboard-server/:/var/www/html/
     networks:
@@ -42,7 +43,6 @@ services:
       - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
       - "traefik.http.routers.api.entrypoints=web"
       - "traefik.docker.network=proxy"
-      - "traefik.http.services.traefik.api.loadbalancer.server.port=8080"
 
   mariadb:
     image: 'mariadb:10'
