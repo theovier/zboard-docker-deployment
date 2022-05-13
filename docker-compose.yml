@@ -60,7 +60,7 @@ services:
       - "traefik.http.routers.api-secure.tls.certresolver=myresolver"
       - "traefik.http.routers.api-secure.tls=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.middlewares.serviceheaders.headers.accesscontrolalloworiginlist=*"
+      - "traefik.http.middlewares.serviceheaders.headers.accesscontrolalloworiginlist=https://zboard.theovier.de"
       - "traefik.http.routers.api-secure.middlewares=serviceheaders"
     networks:
       - proxy
@@ -118,7 +118,6 @@ services:
       - "traefik.http.routers.frontend-secure.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.routers.frontend-secure.tls=true"
-      - "traefik.http.routers.frontend-secure.middlewares=serviceheaders"
     command: ['nginx-debug', '-g', 'daemon off;']
     networks:
       - proxy
