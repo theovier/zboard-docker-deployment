@@ -29,11 +29,12 @@ services:
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.entrypoints=web,websecure"
+      - "traefik.http.routers.traefik.entrypoints=web"
       - "traefik.http.routers.traefik.rule=Host(`admin.theovier.de`)"
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.traefik.middlewares=https-redirect"
       - "traefik.http.routers.traefik-secure.rule=Host(`admin.theovier.de`)"
+      - "traefik.http.routers.traefik-secure.entrypoints=websecure"
       - "traefik.http.routers.traefik-secure.tls.certresolver=myresolver"
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.service=api@internal"
@@ -51,9 +52,13 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.api.entrypoints=web"
       - "traefik.http.routers.api.rule=Host(`api.theovier.de`)"
-      - "traefik.http.routers.api.entrypoints=websecure"
-      - "traefik.http.routers.api.tls.certresolver=myresolver"
+      - "traefik.http.routers.api.middlewares=https-redirect"
+      - "traefik.http.routers.api-secure.rule=Host(`api.theovier.de`)"
+      - "traefik.http.routers.api-secure.entrypoints=websecure"
+      - "traefik.http.routers.api-secure.tls.certresolver=myresolver"
+      - "traefik.http.routers.api-secure.tls=true"
     networks:
       - proxy
       - internal
@@ -82,9 +87,13 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
-      - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
-      - "traefik.http.routers.phpmyadmin.tls.certresolver=myresolver"
+      - "traefik.http.routers.adminer.entrypoints=web"
+      - "traefik.http.routers.adminer.rule=Host(`db.theovier.de`)"
+      - "traefik.http.routers.adminer.middlewares=https-redirect"
+      - "traefik.http.routers.adminer-secure.rule=Host(`db.theovier.de`)"
+      - "traefik.http.routers.adminer-secure.entrypoints=websecure"
+      - "traefik.http.routers.adminer-secure.tls.certresolver=myresolver"
+      - "traefik.http.routers.adminer-secure.tls=true"
     networks:
       - proxy
       - internal
@@ -97,9 +106,13 @@ services:
       - "/root/zboard-client/dist:/usr/share/nginx/html:ro"
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.routers.frontend.rule=Host(`zboard.theovier.de`)"
-      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.middlewares=https-redirect"
+      - "traefik.http.routers.frontend-secure.rule=Host(`zboard.theovier.de`)"
+      - "traefik.http.routers.frontend-secure.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      - "traefik.http.routers.frontend-secure.tls=true"
     command: ['nginx-debug', '-g', 'daemon off;']
     networks:
       - proxy
