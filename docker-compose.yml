@@ -38,7 +38,7 @@ services:
       - "traefik.http.routers.traefik-secure.tls.certresolver=myresolver"
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.service=api@internal"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=root:$$apr1$$9vGpGE0a$$OMe96iABiueNlCyMtcVq6/"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${DASHBOARD_USER}:${DASHBOARD_PASSWORD}"
       - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
     networks:
       - proxy
