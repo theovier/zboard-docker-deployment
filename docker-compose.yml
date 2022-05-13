@@ -58,46 +58,48 @@ services:
       - proxy
       - internal
 
-#  db:
-#    image: 'mariadb:10'
-#    container_name: 'db'
-#    restart: unless-stopped
-#    ports:
-#      - '3306:3306'
-#    environment:
-#      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
-#      MYSQL_DATABASE: '${DB_DATABASE}'
-#      MYSQL_USER: '${DB_USERNAME}'
-#      MYSQL_PASSWORD: '${DB_PASSWORD}'
-#    healthcheck:
-#      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
-#      retries: 3
-#      timeout: 5s
-#    networks:
-#      - internal
-#
-#  adminer:
-#    image: adminer
-#    container_name: 'adminer'
-#    restart: unless-stopped
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
-#      - "traefik.http.routers.phpmyadmin.entrypoints=web"
-#    networks:
-#      - proxy
-#      - internal
-#
-#  frontend:
-#    image: nginx
-#    container_name: 'frontend'
-#    restart: unless-stopped
-#    volumes:
-#      - "/root/zboard-client/dist:/usr/share/nginx/html:ro"
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.frontend.rule=Host(`zboard.theovier.de`)"
-#      - "traefik.http.routers.frontend.entrypoints=web"
-#    command: ['nginx-debug', '-g', 'daemon off;']
-#    networks:
-#      - proxy
+  db:
+    image: 'mariadb:10'
+    container_name: 'db'
+    restart: unless-stopped
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+      retries: 3
+      timeout: 5s
+    networks:
+      - internal
+
+  adminer:
+    image: adminer
+    container_name: 'adminer'
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`db.theovier.de`)"
+      - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
+      - "traefik.http.routers.phpmyadmin.tls.certresolver=myresolver"
+    networks:
+      - proxy
+      - internal
+
+  frontend:
+    image: nginx
+    container_name: 'frontend'
+    restart: unless-stopped
+    volumes:
+      - "/root/zboard-client/dist:/usr/share/nginx/html:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`zboard.theovier.de`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+    command: ['nginx-debug', '-g', 'daemon off;']
+    networks:
+      - proxy
