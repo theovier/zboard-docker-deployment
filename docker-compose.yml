@@ -94,6 +94,7 @@ services:
       - "traefik.http.routers.adminer-secure.entrypoints=websecure"
       - "traefik.http.routers.adminer-secure.tls.certresolver=myresolver"
       - "traefik.http.routers.adminer-secure.tls=true"
+      - "traefik.http.routers.adminer-secure.middlewares=traefik-auth"
     networks:
       - proxy
       - internal
