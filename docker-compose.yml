@@ -115,7 +115,7 @@ services:
       - "traefik.http.routers.frontend.middlewares=https-redirect"
       - "traefik.http.routers.frontend-secure.rule=Host(`zboard.theovier.de`)"
       - "traefik.http.routers.frontend-secure.entrypoints=websecure"
-      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      - "traefik.http.routers.frontend-secure.tls.certresolver=myresolver"
       - "traefik.http.routers.frontend-secure.tls=true"
     command: ['nginx-debug', '-g', 'daemon off;']
     networks:
