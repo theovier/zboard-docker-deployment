@@ -132,13 +132,13 @@ services:
       - '${SOKETI_METRICS_SERVER_PORT:-9601}:9601'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.routers.frontend.rule=Host(`soketi.theovier.de`)"
-      - "traefik.http.routers.frontend.middlewares=https-redirect"
-      - "traefik.http.routers.frontend-secure.rule=Host(`soketi.theovier.de`)"
-      - "traefik.http.routers.frontend-secure.entrypoints=websecure"
-      - "traefik.http.routers.frontend-secure.tls.certresolver=myresolver"
-      - "traefik.http.routers.frontend-secure.tls=true"
+      - "traefik.http.routers.soketi.entrypoints=web"
+      - "traefik.http.routers.soketi.rule=Host(`soketi.theovier.de`)"
+      - "traefik.http.routers.soketi.middlewares=https-redirect"
+      - "traefik.http.routers.soketi-secure.rule=Host(`soketi.theovier.de`)"
+      - "traefik.http.routers.soketi-secure.entrypoints=websecure"
+      - "traefik.http.routers.soketi-secure.tls.certresolver=myresolver"
+      - "traefik.http.routers.soketi-secure.tls=true"
     networks:
       - internal
       - proxy
