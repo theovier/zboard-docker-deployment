@@ -120,3 +120,25 @@ services:
     command: ['nginx-debug', '-g', 'daemon off;']
     networks:
       - proxy
+
+  soketi:
+    image: 'quay.io/soketi/soketi:latest-16-alpine'
+    container_name: 'soketi'
+    environment:
+      SOKETI_DEFAULT_APP_ID: '${PUSHER_APP_ID}'
+      SOKETI_DEFAULT_APP_KEY: '${PUSHER_APP_KEY}'
+    ports:
+      - '${SOKETI_PORT:-6001}:6001'
+      - '${SOKETI_METRICS_SERVER_PORT:-9601}:9601'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.rule=Host(`soketi.theovier.de`)"
+      - "traefik.http.routers.frontend.middlewares=https-redirect"
+      - "traefik.http.routers.frontend-secure.rule=Host(`soketi.theovier.de`)"
+      - "traefik.http.routers.frontend-secure.entrypoints=websecure"
+      - "traefik.http.routers.frontend-secure.tls.certresolver=myresolver"
+      - "traefik.http.routers.frontend-secure.tls=true"
+    networks:
+      - internal
+      - proxy
