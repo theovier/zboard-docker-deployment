@@ -14,6 +14,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "6001:6001"
     volumes:
       - "/root/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -23,6 +24,7 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.ws.address=:6001"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.email=webmaster@theovier.de"
@@ -125,16 +127,17 @@ services:
     image: 'quay.io/soketi/soketi:latest-16-alpine'
     container_name: 'soketi'
     environment:
+      DEBUG: 1
       SOKETI_DEFAULT_APP_ID: '${PUSHER_APP_ID}'
       SOKETI_DEFAULT_APP_KEY: '${PUSHER_APP_KEY}'
     ports:
-      - '${SOKETI_PORT:-6001}:6001'
-      - '${SOKETI_METRICS_SERVER_PORT:-9601}:9601'
+      - 9601:9601
+            # - '6001:6001'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.soketi.entrypoints=web"
+        #- "traefik.http.routers.soketi.entrypoints=web"
+      - "traefik.http.routers.soketi.entrypoints=ws"
       - "traefik.http.routers.soketi.rule=Host(`soketi.theovier.de`)"
-      - "traefik.http.routers.soketi.middlewares=https-redirect"
       - "traefik.http.routers.soketi-secure.rule=Host(`soketi.theovier.de`)"
       - "traefik.http.routers.soketi-secure.entrypoints=websecure"
       - "traefik.http.routers.soketi-secure.tls.certresolver=myresolver"
